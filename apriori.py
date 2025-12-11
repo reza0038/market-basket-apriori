@@ -67,12 +67,23 @@ def parse_list(x):
     
 def return_item_df(item_antecedents):
     data = rules[["antecedents", "consequents"]].copy()
-    
     data["antecedents"] = data["antecedents"].apply(parse_list)
     data["consequents"] = data["consequents"].apply(parse_list)
 
-    return list(data.loc[data["antecedents"] == item_antecedents].iloc[0,:])
+    filtered = data.loc[data["antecedents"] == item_antecedents]
+
+    # Jika tidak ada rule → kembalikan None
+    if filtered.empty:
+        return None
+
+    return list(filtered.iloc[0, :])
 
 if type(data) != type ("No Result"):
     st.markdown(f"Hasil Rekomendasi :")
-    st.success(f"Jika Konsumen membeli **{item}**, maka membeli **{return_item_df(item)[1]}** secara bersamaan.")
+
+   result = return_item_df(item)
+
+if result is None:
+    st.warning(f"Tidak ditemukan kombinasi item untuk **{item}**.")
+else:
+    st.success(f"Jika Konsumen membeli **{item}**, maka mereka biasanya membeli **{result[1]}** secara bersamaan.")
